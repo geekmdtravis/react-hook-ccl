@@ -1,0 +1,79 @@
+{
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=14",
+    "yarn": "please-use-npm"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test --silent",
+    "test:watch": "tsdx test --watch --silent",
+    "test:watchall": "tsdx test --watchAll --silent",
+    "lint": "tsdx lint src",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why",
+    "demo": "cd demo-app && npm i && npm run dev"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "name": "react-hook-useccl",
+  "author": "geekmdtravis",
+  "module": "dist/react-hook-useccl.esm.js",
+  "size-limit": [
+    {
+      "path": "dist/react-hook-useccl.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/react-hook-useccl.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "7.0.5",
+    "@size-limit/webpack": "7.0.5",
+    "@size-limit/webpack-why": "7.0.5",
+    "@types/react": "^17.0.0 || ^18.0.0",
+    "@types/react-dom": "^17.0.0 || ^18.0.0",
+    "husky": "7.0.4",
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0",
+    "size-limit": "7.0.5",
+    "tsdx": "0.14.1",
+    "tslib": "2.3.1",
+    "typescript": "4.5.4"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0"
+  },
+  "jest": {
+    "verbose": true,
+    "silent": true,
+    "collectCoverage": true,
+    "testPathIgnorePatterns": [
+      "index.ts"
+    ],
+    "coveragePathIgnorePatterns": [
+      "index.ts"
+    ]
+  }
+}
