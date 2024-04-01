@@ -5,4 +5,3 @@ dist
 coverage
 _localTest.js
 _localTest.ts
-package-lock.json
