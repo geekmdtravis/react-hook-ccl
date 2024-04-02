@@ -3,6 +3,15 @@ import { useCcl } from './useCcl';
 export { useCcl };
 
 declare global {
+  interface ImportMetaEnv {
+    readonly MODE: string;
+    readonly DEV: boolean;
+    readonly PROD: boolean;
+  }
+
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
   /**
    * Class for the Cerner Windows COM Object for an XMLCclRequest.
    * Useful for development but not intended for production use.

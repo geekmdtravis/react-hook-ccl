@@ -3,13 +3,15 @@ import { useState, useEffect, useMemo } from 'react';
 /**
  * A custom React hook to make CCL calls to the Cerner PowerChart application.
  * @param {string} prg  - the name of the CCL program to call.
- * @param {{pollInterval?: number, mockJSON?: string}} opts - (optional) an
- * object containing the poll interval and mock JSON string. The poll interval
- * is the time in milliseconds to wait before making another request. If the
- * poll interval is set to 0, the request will only be made once. The mock JSON
- * string is a string representation of the JSON object to be returned when the
- * request is made. This is useful for testing the hook without needing to make
- * actual CCL calls.
+ * @param opts - (optional) an object containing the poll interval and mock JSON
+ * string.
+ * - `pollInterval` - the interval in milliseconds to poll the CCL program.
+ * - `mockJSON` - a string representing the mock JSON data to return.
+ * - `mode` - the mode to run the hook in. Options are 'production', 'development',
+ * and 'auto'. In 'production' mode, the hook will make a real CCL request. In
+ * 'development' mode, the hook will return the mock JSON data. In 'auto' mode,
+ * the hook will determine the mode based on the environment. The default behavior
+ * is 'auto' which behaves the same way as if the parameter is undefined.
  * @returns
  */
 export function useCcl<T>(
@@ -18,6 +20,7 @@ export function useCcl<T>(
   opts?: {
     pollInterval?: number;
     mockJSON?: string;
+    mode?: 'production' | 'development' | 'auto';
   }
 ): {
   loading: boolean;
@@ -33,7 +36,7 @@ export function useCcl<T>(
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<XmlCclResult>('im a teapot');
   const [status, setStatus] = useState<XmlCclReadyState>('uninitialized');
-  const { pollInterval, mockJSON } = opts || {};
+  const { pollInterval, mockJSON, mode } = opts || {};
 
   // @eslint-ignore react-hooks/exhaustive-deps
   const memoizedParams = useMemo(() => params, []);
@@ -89,7 +92,26 @@ export function useCcl<T>(
       }
     };
 
-    const fetch = mockJSON ? fetchMockData : fetchCclData;
+    let fetch = import.meta.env.DEV ? fetchMockData : fetchCclData;
+
+    switch (mode) {
+      case 'production':
+        fetch = fetchCclData;
+        break;
+      case 'development':
+        fetch = fetchMockData;
+        break;
+      case 'auto':
+      default:
+        break;
+    }
+
+    if (mode === 'development' && !mockJSON) {
+      setErrors(currentErrors => [
+        ...currentErrors,
+        'When in development mode, a mock JSON string must be provided.',
+      ]);
+    }
 
     if (pollInterval && pollInterval > 0) {
       const interval = setInterval(fetch, pollInterval);
@@ -372,9 +394,9 @@ async function mockMakeCclRequestAsync<T>(
 ): Promise<CclRequestResponse<T>> {
   const response: CclRequestResponse<T> = {
     inPowerChart: false,
-    code: 418,
-    result: 'im a teapot',
-    status: 'uninitialized',
+    code: 200,
+    result: 'success',
+    status: 'completed',
     details: '',
     data: undefined,
     __request: undefined,
@@ -383,6 +405,7 @@ async function mockMakeCclRequestAsync<T>(
     setTimeout(() => {
       try {
         response.data = JSON.parse(json) as T;
+        response.details = json;
         resolve(response);
       } catch (e) {
         if (e instanceof SyntaxError) {

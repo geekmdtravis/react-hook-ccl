@@ -4,13 +4,26 @@ import viteLogo from '/vite.svg';
 import './App.css';
 import { useState } from 'react';
 
+type MockCclData = {
+  secretMessage: string;
+  secretNumber: number;
+};
+
+const MOCK_DATA: MockCclData = {
+  secretMessage: 'hello',
+  secretNumber: 123,
+};
+
+const MOCK_JSON = JSON.stringify(MOCK_DATA);
+
 function App() {
   const [inputText, setInputText] = useState('500');
   const pollInterval = parseInt(inputText) || undefined;
 
-  const res = useCcl<{ secretMessage: string }>('A_FAKE_PRG', ['abc', 123], {
+  const res = useCcl<MockCclData>('A_FAKE_PRG', ['abc', 123], {
     pollInterval,
-    mockJSON: `{ "secretMessage": "hello"}`,
+    mockJSON: MOCK_JSON,
+    mode: 'development',
   });
 
   return (
@@ -36,7 +49,16 @@ function App() {
         onChange={e => setInputText(e.target.value)}
       />
       <div>
-        <pre style={{ textAlign: 'left' }}>{JSON.stringify(res, null, 4)}</pre>
+        <pre
+          style={{
+            textAlign: 'left',
+            padding: '1rem',
+            backgroundColor: '#373737',
+            marginTop: '2rem',
+          }}
+        >
+          {JSON.stringify(res, null, 4)}
+        </pre>
       </div>
 
       <p className="read-the-docs">More coming soon!</p>
