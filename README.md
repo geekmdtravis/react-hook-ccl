@@ -2,6 +2,14 @@
 
 _Author: Travis Nesbit, MD ([@geekmdtravis](https://github.com/geekmdtravis/))_
 
+| Environment | CI                                                                                                                           | Publish                                                                                                 |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Production  | ![Main Build](https://github.com/geekmdtravis/react-hook-ccl/actions/workflows/main.yml/badge.svg?branch=main)               | ![Main Publish](https://github.com/geekmdtravis/react-hook-ccl/actions/workflows/publish.yml/badge.svg) |
+| Development | ![Development Build](https://github.com/geekmdtravis/react-hook-ccl/actions/workflows/main.yml/badge.svg?branch=development) | &mdash;                                                                                                 |
+
+![License](https://img.shields.io/github/license/geekmdtravis/react-hook-ccl.svg)
+![npm](https://img.shields.io/npm/v/react-hook-useccl.svg)
+
 ## Overview
 
 A useful React hook written in TypeScript which wraps the `XMLCclRequest` exposed as a native function
