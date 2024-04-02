@@ -6,6 +6,8 @@ import { useState, useEffect, useMemo } from 'react';
  * @param opts - (optional) an object containing the poll interval and mock JSON
  * string.
  * - `pollInterval` - the interval in milliseconds to poll the CCL program.
+ * - `excludeMine` - a boolean value to determine whether or not to include the
+ * "MINE" parameter as the first parameter in the CCL request's argument list.
  * - `mockJSON` - a string representing the mock JSON data to return.
  * - `mode` - the mode to run the hook in. Options are 'production', 'development',
  * and 'auto'. In 'production' mode, the hook will make a real CCL request. In
@@ -19,6 +21,7 @@ export function useCcl<T>(
   params: Array<CclCallParam | number | string> = [],
   opts?: {
     pollInterval?: number;
+    excludeMine?: boolean;
     mockJSON?: string;
     mode?: 'production' | 'development' | 'auto';
   }
@@ -36,7 +39,7 @@ export function useCcl<T>(
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<XmlCclResult>('im a teapot');
   const [status, setStatus] = useState<XmlCclReadyState>('uninitialized');
-  const { pollInterval, mockJSON, mode } = opts || {};
+  const { pollInterval, mockJSON, mode, excludeMine } = opts || {};
 
   // @eslint-ignore react-hooks/exhaustive-deps
   const memoizedParams = useMemo(() => params, []);
@@ -79,7 +82,11 @@ export function useCcl<T>(
     const fetchCclData = async () => {
       setLoading(true);
       try {
-        const response = await makeCclRequestAsync<T>(prg, memoizedParams);
+        const response = await makeCclRequestAsync<T>(
+          prg,
+          memoizedParams,
+          excludeMine
+        );
         handleResponse(response);
       } catch (e) {
         if (e instanceof Error) {
