@@ -1,6 +1,18 @@
 {
+  "name": "react-hook-useccl",
+  "author": "geekmdtravis",
+  "module": "dist/react-hook-useccl.esm.js",
   "version": "0.3.1",
   "license": "MIT",
+  "description": "A useful React hook written in TypeScript which wraps the XMLCclRequest exposed as a native function to the Microsoft Edge Chromium Browser in the Cerner Discern environment (e.g. PowerChart).",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geekmdtravis/react-hook-ccl.git"
+  },
+  "bugs": {
+    "url": "https://github.com/geekmdtravis/react-hook-ccl/issues"
+  },
+  "homepage": "https://github.com/geekmdtravis/react-hook-ccl#readme",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -34,9 +46,6 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "react-hook-useccl",
-  "author": "geekmdtravis",
-  "module": "dist/react-hook-useccl.esm.js",
   "size-limit": [
     {
       "path": "dist/react-hook-useccl.cjs.production.min.js",

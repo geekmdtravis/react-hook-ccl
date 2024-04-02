@@ -5,7 +5,7 @@ _Author: Travis Nesbit, MD ([@geekmdtravis](https://github.com/geekmdtravis/))_
 ## Overview
 
 A useful React hook written in TypeScript which wraps the `XMLCclRequest` exposed as a native function
-to the Microsoft Edge Chromium Browser in the _Cerner Discern_ environment (e.g. _PowerChart_). Of note, while this hook is only intended for use within the _Cerner Discern_ environment. It will not work in other environments. Additionally, while it _might_ work in other browsers, it is only currently being developed for compatibility with the Microsoft Edge Chromium Browser.
+to the Microsoft Edge Chromium Browser in the _Cerner Discern_ environment (e.g. _PowerChart_). Of note, this hook is only intended for use within the _Cerner Discern_ environment and it will not work in other environments. Additionally, while it _might_ work in other browsers like Microsoft Internet Explorer, it is untested in t hem and is only currently being developed for compatibility with the Microsoft Edge Chromium Browser.
 
 ## Example usage:
 
