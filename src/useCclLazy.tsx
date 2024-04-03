@@ -1,4 +1,3 @@
-import { useState, useEffect, useMemo } from 'react';
 import {
   CclCallParam,
   CclRequestResponse,
@@ -6,14 +5,14 @@ import {
   XmlCclResult,
   makeCclRequestAsync,
 } from 'easy-ccl-request';
-import { mockMakeCclRequestAsync } from './utils/mockMakeCclRequestAsync';
+import { useMemo, useState } from 'react';
+import { mockMakeCclRequestAsync } from './utils';
 
 /**
- * A custom React hook to make CCL calls to the Cerner PowerChart application eagerly.
+ * A custom React hook to make CCL calls to the Cerner PowerChart application lazily.
  * @param {string} prg  - the name of the CCL program to call.
  * @param opts - (optional) an object containing the poll interval and mock JSON
  * string.
- * - `pollInterval` - the interval in milliseconds to poll the CCL program.
  * - `excludeMine` - a boolean value to determine whether or not to include the
  * "MINE" parameter as the first parameter in the CCL request's argument list.
  * - `mockJSON` - a string representing the mock JSON data to return.
@@ -25,6 +24,7 @@ import { mockMakeCclRequestAsync } from './utils/mockMakeCclRequestAsync';
  * @returns a hook object with the following properties:
  * - `loading` - a boolean value indicating whether the request is loading.
  * - `errors` - an array of error messages.
+ * - `callback` - a function to call to make the CCL request.
  * - `abort` - a function to call to abort the CCL request.
  * - `inPowerChart` - a boolean value indicating whether the request is in PowerChart.
  * - `code` - the HTTP status code of the request.
@@ -34,11 +34,10 @@ import { mockMakeCclRequestAsync } from './utils/mockMakeCclRequestAsync';
  * - `data` - the data returned by the request.
  * - `__request` - the underlying XMLHttpRequest object used to make the request.
  */
-export function useCcl<T>(
+export function useCclLazy<T>(
   prg: string,
   params: Array<CclCallParam | number | string> = [],
   opts?: {
-    pollInterval?: number;
     excludeMine?: boolean;
     mockJSON?: string;
     mode?: 'production' | 'development' | 'auto';
@@ -46,8 +45,10 @@ export function useCcl<T>(
 ): {
   loading: boolean;
   errors: Array<string>;
+  callback: () => void;
   abort: () => void;
 } & CclRequestResponse<T> {
+  const { excludeMine, mockJSON, mode } = opts || {};
   const [__request, setRequest] = useState<XMLCclRequest>();
   const [code, setCode] = useState(418);
   const [data, setData] = useState<T>();
@@ -57,7 +58,6 @@ export function useCcl<T>(
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<XmlCclResult>('im a teapot');
   const [status, setStatus] = useState<XmlCclReadyState>('uninitialized');
-  const { pollInterval, mockJSON, mode, excludeMine } = opts || {};
 
   // @eslint-ignore react-hooks/exhaustive-deps
   const memoizedParams = useMemo(() => params, []);
@@ -80,57 +80,7 @@ export function useCcl<T>(
     }
   }
 
-  useEffect(() => {
-    const fetchMockData = async () => {
-      setLoading(true);
-      try {
-        const response = await mockMakeCclRequestAsync<T>(mockJSON || '{}');
-        handleResponse(response);
-      } catch (e) {
-        if (e instanceof Error) {
-          setErrors(currentErrors => [...currentErrors, (e as Error).message]);
-        } else {
-          throw e;
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchCclData = async () => {
-      setLoading(true);
-      try {
-        const response = await makeCclRequestAsync<T>(
-          prg,
-          memoizedParams,
-          excludeMine
-        );
-        handleResponse(response);
-      } catch (e) {
-        if (e instanceof Error) {
-          setErrors(currentErrors => [...currentErrors, (e as Error).message]);
-        } else {
-          throw e;
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    let fetch = import.meta.env.DEV ? fetchMockData : fetchCclData;
-
-    switch (mode) {
-      case 'production':
-        fetch = fetchCclData;
-        break;
-      case 'development':
-        fetch = fetchMockData;
-        break;
-      case 'auto':
-      default:
-        break;
-    }
-
+  async function callback(): Promise<CclRequestResponse<T>> {
     if (mode === 'development' && !mockJSON) {
       setErrors(currentErrors => [
         ...currentErrors,
@@ -138,17 +88,57 @@ export function useCcl<T>(
       ]);
     }
 
-    if (pollInterval && pollInterval > 0) {
-      const interval = setInterval(fetch, pollInterval);
-      return () => clearInterval(interval);
+    const res: CclRequestResponse<T> = {
+      inPowerChart,
+      code,
+      result,
+      status,
+      details,
+      data,
+      __request,
+    };
+
+    setLoading(true);
+
+    if (mode === 'development' || (mode === 'auto' && import.meta.env.DEV)) {
+      try {
+        const response = await mockMakeCclRequestAsync<T>(mockJSON || '{}');
+        handleResponse(response);
+        return response;
+      } catch (e) {
+        if (e instanceof Error) {
+          setErrors(currentErrors => [...currentErrors, (e as Error).message]);
+        } else {
+          throw e;
+        }
+      } finally {
+        setLoading(false);
+      }
     } else {
-      fetch();
-      return;
+      try {
+        const response = await makeCclRequestAsync<T>(
+          prg,
+          memoizedParams,
+          excludeMine
+        );
+        handleResponse(response);
+        return response;
+      } catch (e) {
+        if (e instanceof Error) {
+          setErrors(currentErrors => [...currentErrors, (e as Error).message]);
+        } else {
+          throw e;
+        }
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [prg, memoizedParams, pollInterval, mockJSON]);
+    return res;
+  }
 
   return {
     abort,
+    callback,
     loading,
     errors,
     inPowerChart,
