@@ -82,3 +82,13 @@ export default App;
 - `details`: a `string` value which represents the full status text (response in string form) of the response. This will be an empty string until the request is complete.
 - `data`: an `Object` which represenets the response data from the CCL call. This will be `undefined` until the request is complete. When using _TypeScript_ this object will be of type `T`.
 - `__request`: The underlying `XMLCclRequest` object. This is exposed for advanced users who may need to interact with the request object directly.
+
+## Important Usages Notes: Peer Dependencies
+
+This project uses the `easy-ccl-request` package to handle the CCL requests. Because this package is commonly used , it was included here as a peer dependency. This means that you will need to install `easy-ccl-request` in your project in order to use this hook. You can install it by running the following command:
+
+```bash
+npm install easy-ccl-request
+```
+
+Choosing to make this dependency a peer dependency that `react-hook-useccl` will use your project's version of the `easy-ccl-request`. This was done to minimize version conflicts and incompatabilities. This package, `react-hook-useccl`, is actively developed to work with versions identified in the `peerDependencies` section of the _package.json_ file of this project.
