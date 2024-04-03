@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { mockMakeCclRequestAsync } from './utils';
 import {
   CclCallParam,
   CclRequestResponse,
@@ -5,8 +7,16 @@ import {
   XmlCclResult,
   makeCclRequestAsync,
 } from 'easy-ccl-request';
-import { useState } from 'react';
-import { mockMakeCclRequestAsync } from './utils';
+
+// TODO: figure out how to handle ESLint error regarding this type def and re-enable
+// export type UseCclLazyReturn<T> = [
+//   () => Promise<void>,
+//   () => void,
+//   {
+//     loading: boolean;
+//     errors: Array<string>;
+//   } & CclRequestResponse<T>
+// ];
 
 /**
  * A custom React hook to make CCL calls to the Cerner PowerChart application lazily.
@@ -43,14 +53,7 @@ export function useCclLazy<T>(
     mockJSON?: string;
     mode?: 'production' | 'development' | 'auto';
   }
-): [
-  () => Promise<CclRequestResponse<T>>,
-  () => void,
-  {
-    loading: boolean;
-    errors: Array<string>;
-  } & CclRequestResponse<T>
-] {
+) {
   const { excludeMine, mockJSON, mode } = opts || {};
   const [__request, setRequest] = useState<XMLCclRequest>();
   const [code, setCode] = useState(418);
