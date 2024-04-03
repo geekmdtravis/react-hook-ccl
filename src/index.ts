@@ -1,6 +1,7 @@
 import { useCcl } from './useCcl';
+import { useCclLazy } from './useCclLazy';
 
-export { useCcl };
+export { useCcl, useCclLazy };
 
 declare global {
   interface ImportMetaEnv {
