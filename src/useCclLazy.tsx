@@ -5,7 +5,7 @@ import {
   XmlCclResult,
   makeCclRequestAsync,
 } from 'easy-ccl-request';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { mockMakeCclRequestAsync } from './utils';
 
 /**
@@ -62,9 +62,6 @@ export function useCclLazy<T>(
   const [result, setResult] = useState<XmlCclResult>('im a teapot');
   const [status, setStatus] = useState<XmlCclReadyState>('uninitialized');
 
-  // @eslint-ignore react-hooks/exhaustive-deps
-  const memoizedParams = useMemo(() => params, []);
-
   function handleResponse(response: CclRequestResponse<T>) {
     setInPowerChart(response.inPowerChart);
     setCode(response.code);
@@ -119,11 +116,7 @@ export function useCclLazy<T>(
       }
     } else {
       try {
-        const response = await makeCclRequestAsync<T>(
-          prg,
-          memoizedParams,
-          excludeMine
-        );
+        const response = await makeCclRequestAsync<T>(prg, params, excludeMine);
         handleResponse(response);
         return response;
       } catch (e) {

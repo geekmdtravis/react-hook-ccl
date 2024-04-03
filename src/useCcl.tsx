@@ -59,7 +59,7 @@ export function useCcl<T>(
   const [status, setStatus] = useState<XmlCclReadyState>('uninitialized');
   const { pollInterval, mockJSON, mode, excludeMine } = opts || {};
 
-  // @eslint-ignore react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedParams = useMemo(() => params, []);
 
   function handleResponse(response: CclRequestResponse<T>) {
@@ -145,7 +145,7 @@ export function useCcl<T>(
       fetch();
       return;
     }
-  }, [prg, memoizedParams, pollInterval, mockJSON]);
+  }, [prg, memoizedParams, pollInterval, mockJSON, excludeMine, mode]);
 
   return {
     abort,
