@@ -1,4 +1,4 @@
-import { useCcl } from '../../';
+import { useCcl, useCclLazy } from '../../';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
@@ -20,11 +20,19 @@ function App() {
   const [inputText, setInputText] = useState('500');
   const pollInterval = parseInt(inputText) || undefined;
 
-  const res = useCcl<MockCclData>('A_FAKE_PRG', ['abc', 123], {
+  const eagerRes = useCcl<MockCclData>('A_FAKE_PRG', ['abc', 123], {
     pollInterval,
     mockJSON: MOCK_JSON,
     mode: 'development',
   });
+  const [fetch, abort, lazyRes] = useCclLazy<MockCclData>(
+    'A_FAKE_PRG',
+    ['abc', 123],
+    {
+      mockJSON: MOCK_JSON,
+      mode: 'development',
+    }
+  );
 
   return (
     <>
@@ -48,6 +56,7 @@ function App() {
         value={inputText}
         onChange={e => setInputText(e.target.value)}
       />
+      <h2>Eager Loading</h2>
       <div>
         <pre
           style={{
@@ -57,8 +66,25 @@ function App() {
             marginTop: '2rem',
           }}
         >
-          {JSON.stringify(res, null, 4)}
+          {JSON.stringify(eagerRes, null, 4)}
         </pre>
+      </div>
+      <h2>Lazy Loading</h2>
+      <div>
+        <pre
+          style={{
+            textAlign: 'left',
+            padding: '1rem',
+            backgroundColor: '#373737',
+            marginTop: '2rem',
+          }}
+        >
+          {JSON.stringify(lazyRes, null, 4)}
+        </pre>
+        <button onClick={fetch} style={{ marginRight: '1rem' }}>
+          Fetch
+        </button>
+        <button onClick={abort}>Abort</button>
       </div>
 
       <p className="read-the-docs">More coming soon!</p>

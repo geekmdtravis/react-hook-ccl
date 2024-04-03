@@ -21,7 +21,8 @@ import { mockMakeCclRequestAsync } from './utils';
  * 'development' mode, the hook will return the mock JSON data. In 'auto' mode,
  * the hook will determine the mode based on the environment. The default behavior
  * is 'auto' which behaves the same way as if the parameter is undefined.
- * @returns a hook object with the following properties:
+ * @returns a hook `Array` with three members `[fetch, abort, response]`.
+ * The `response` has the following properties:
  * - `loading` - a boolean value indicating whether the request is loading.
  * - `errors` - an array of error messages.
  * - `callback` - a function to call to make the CCL request.
@@ -42,12 +43,14 @@ export function useCclLazy<T>(
     mockJSON?: string;
     mode?: 'production' | 'development' | 'auto';
   }
-): {
-  loading: boolean;
-  errors: Array<string>;
-  callback: () => void;
-  abort: () => void;
-} & CclRequestResponse<T> {
+): [
+  () => Promise<CclRequestResponse<T>>,
+  () => void,
+  {
+    loading: boolean;
+    errors: Array<string>;
+  } & CclRequestResponse<T>
+] {
   const { excludeMine, mockJSON, mode } = opts || {};
   const [__request, setRequest] = useState<XMLCclRequest>();
   const [code, setCode] = useState(418);
@@ -136,17 +139,19 @@ export function useCclLazy<T>(
     return res;
   }
 
-  return {
-    abort,
+  return [
     callback,
-    loading,
-    errors,
-    inPowerChart,
-    code,
-    result,
-    status,
-    details,
-    data,
-    __request,
-  };
+    abort,
+    {
+      loading,
+      errors,
+      inPowerChart,
+      code,
+      result,
+      status,
+      details,
+      data,
+      __request,
+    },
+  ];
 }
