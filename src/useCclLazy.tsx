@@ -83,7 +83,7 @@ export function useCclLazy<T>(
     }
   }
 
-  async function callback(): Promise<CclRequestResponse<T>> {
+  async function fetch(): Promise<CclRequestResponse<T>> {
     if (mode === 'development' && !mockJSON) {
       setErrors(currentErrors => [
         ...currentErrors,
@@ -136,7 +136,7 @@ export function useCclLazy<T>(
   }
 
   return [
-    callback,
+    fetch,
     abort,
     {
       loading,
@@ -151,3 +151,5 @@ export function useCclLazy<T>(
     },
   ];
 }
+
+
